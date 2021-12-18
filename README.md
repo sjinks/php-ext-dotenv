@@ -1,5 +1,8 @@
 # php-ext-dotenv
 
+[![Build and Test](https://github.com/sjinks/php-ext-dotenv/actions/workflows/test.yml/badge.svg)](https://github.com/sjinks/php-ext-dotenv/actions/workflows/test.yml)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=sjinks_php-ext-dotenv&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=sjinks_php-ext-dotenv)
+
 A PHP extension that sets environment variables from a file on request startup.
 
 ## Installation
