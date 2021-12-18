@@ -28,6 +28,9 @@ jobs:
       - name: Check out the source code
         uses: actions/checkout@v2
 
+      - name: Install valgrind
+        run: sudo apt-get -qq update && sudo apt-get -y install valgrind
+
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
