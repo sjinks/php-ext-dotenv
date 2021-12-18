@@ -16,7 +16,7 @@ static void ini_parser_callback(zval* key, zval* value, zval* index, int callbac
         Z_ADDREF_P(value);
         zend_hash_update(ht, Z_STR_P(key), value);
 
-        convert_to_cstring(value);
+        convert_to_string(value);
         setenv(Z_STRVAL_P(key), Z_STRVAL_P(value), 1);
 
         Z_ADDREF_P(value);
