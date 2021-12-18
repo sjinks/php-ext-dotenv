@@ -9,7 +9,7 @@ PHP_INI_BEGIN()
     STD_PHP_INI_ENTRY("dotenv.file", "", PHP_INI_ALL, OnUpdateString, filename, zend_dotenv_globals, dotenv_globals)
 PHP_INI_END()
 
-static void ini_parser_callback(zval *key, zval *value, zval *index, int callback_type, void *arg)
+static void ini_parser_callback(zval* key, zval* value, zval* index, int callback_type, void* arg)
 {
     HashTable* ht = (HashTable*)arg;
     if (callback_type == ZEND_INI_PARSER_ENTRY && key) {
