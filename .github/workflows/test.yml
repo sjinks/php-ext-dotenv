@@ -41,7 +41,7 @@ jobs:
         run: phpize && ./configure CC=${{ matrix.compiler.CC }} --silent && make --silent
 
       - name: Run tests
-        run: make test TESTS=-m
+        run: make test TESTS="-m --show-diff --show-out --show-mem"
         env:
           NO_INTERACTION: "1"
           REPORT_EXIT_STATUS: "1"
