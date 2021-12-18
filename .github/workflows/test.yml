@@ -7,6 +7,8 @@ on:
 
 env:
   CFLAGS: "-O2 -g3 -Wall -Werror"
+  NO_INTERACTION: "1"
+  REPORT_EXIT_STATUS: "1"
 
 jobs:
   ci:
@@ -40,8 +42,6 @@ jobs:
       - name: Run tests
         run: make test
         env:
-          NO_INTERACTION: "1"
-          REPORT_EXIT_STATUS: "1"
           TEST_PHP_ARGS: "--show-diff --show-out"
 
   ci-valgrind:
@@ -75,6 +75,4 @@ jobs:
       - name: Run tests
         run: make test
         env:
-          NO_INTERACTION: "1"
-          REPORT_EXIT_STATUS: "1"
           TEST_PHP_ARGS: "-m --show-diff --show-out --show-mem"
