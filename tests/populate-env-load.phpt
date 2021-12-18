@@ -1,10 +1,10 @@
 --TEST--
-Load ini file (populate $_ENV)
+Load ini file (variables_order=EGPCS)
 --SKIPIF--
 <?php require 'skipif.inc'; ?>
 --INI--
 dotenv.file = {PWD}/sample.env
-dotenv.populate_env = On
+variables_order = EGPCS
 --FILE--
 <?php
 var_export($_ENV['FOO']);

@@ -16,15 +16,13 @@ sudo make install
 
 ## Configuration
 
-
+|-----------------------|--------|----------------|---------------------------------------------------------------------|
 | `dotenv.file`         | string | PHP_INI_PERDIR | Name of the environment file.                                       |
 |-----------------------|--------|----------------|---------------------------------------------------------------------|
-| `dotenv.populate_env` | bool   | PHP_INI_PERDIR | Whether to populate the `$_ENV` superglobal. Default value: `false` |
 
 Example:
 ```ini
 dotenv.file = /path/to/my/.env
-dotenv.populate_env = On
 ```
 
 For CGI and FastCGI, it is possible to set different values for [different hosts and paths](https://www.php.net/manual/en/ini.sections.php):
@@ -40,7 +38,7 @@ dotenv.file = /path/to/example.org/.env
 
 ## How It Works
 
-During the request startup, the extension reads the file specified in the `dotenv.file` setting, [parses that file as an INI-file](https://www.php.net/manual/en/function.parse-ini-file.php), and populates the environment with the keys and values read from the file. If `dotenv.populate_env` is on, the extension will populate the `$_ENV` superglobal.
+During the request startup, the extension reads the file specified in the `dotenv.file` setting, [parses that file as an INI-file](https://www.php.net/manual/en/function.parse-ini-file.php), and populates the environment with the keys and values read from the file.
 
 The keys from the file will *overwrite* the existing environment variables.
 

@@ -1,10 +1,10 @@
 --TEST--
-Check $_ENV and getenv() match
+Check $_ENV and getenv() match (variables_order=EGPCS)
 --SKIPIF--
 <?php require 'skipif.inc'; ?>
 --INI--
 dotenv.file = {PWD}/sample.env
-dotenv.populate_env = On
+variables_order = EGPCS
 --FILE--
 <?php
 assert($_ENV['FOO'] === getenv('FOO'));

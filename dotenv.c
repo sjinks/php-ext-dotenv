@@ -8,30 +8,19 @@ ZEND_DECLARE_MODULE_GLOBALS(dotenv);
 
 PHP_INI_BEGIN()
     STD_PHP_INI_ENTRY("dotenv.file", "", PHP_INI_PERDIR, OnUpdateString, filename, zend_dotenv_globals, dotenv_globals)
-    STD_PHP_INI_BOOLEAN("dotenv.populate_env", "0", PHP_INI_PERDIR, OnUpdateBool, populate_env, zend_dotenv_globals, dotenv_globals)
 PHP_INI_END()
-
-typedef struct callback_ctx {
-    HashTable* env;
-    HashTable* keys;
-} callback_ctx_t;
 
 static void ini_parser_callback(zval* key, zval* value, zval* index, int callback_type, void* arg)
 {
-    callback_ctx_t* ctx = (callback_ctx_t*)arg;
+    HashTable* tbl = (HashTable*)arg;
 
     if (callback_type == ZEND_INI_PARSER_ENTRY && key) {
         assert(Z_TYPE_P(key) == IS_STRING);
         assert(Z_TYPE_P(value) == IS_STRING);
 
-        if (ctx->env) {
-            Z_ADDREF_P(value);
-            zend_hash_update(ctx->env, Z_STR_P(key), value);
-        }
-
         setenv(Z_STRVAL_P(key), Z_STRVAL_P(value), 1);
         /* Debug build of ZE does not like NULL in the third argument; we pass a valid pointer to keep ZE happy */
-        zend_hash_update_ptr(ctx->keys, Z_STR_P(key), Z_STR_P(key));
+        zend_hash_update_ptr(tbl, Z_STR_P(key), Z_STR_P(key));
     }
 }
 
@@ -48,32 +37,15 @@ static void load_env_file()
         }
 
         zend_file_handle fh;
-        zend_stream_init_fp(&fh, f, filename);
-
-        callback_ctx_t ctx;
-        ctx.env  = NULL;
-        ctx.keys = &DOTENV_G(entries);
-
-        if (DOTENV_G(populate_env)) {
-            if (PG(auto_globals_jit)) {
-#if PHP_VERSION_ID >= 80100
-                zend_is_auto_global(ZSTR_KNOWN(ZEND_STR_AUTOGLOBAL_ENV));
+#if PHP_VERSION_ID < 70400
+        memset(&fh, 0, sizeof(fh));
+        fh.type      = ZEND_HANDLE_FP;
+        fh.handle.fp = fp;
+        fh.filename  = zend_string_init(filename, strlen(filename), 0);
 #else
-                zend_is_auto_global_str(ZEND_STRL("_ENV"));
+        zend_stream_init_fp(&fh, f, filename);
 #endif
-            }
-
-            zval* ptr = &PG(http_globals)[TRACK_VARS_ENV];
-            if (ptr && Z_TYPE_P(ptr) == IS_ARRAY) {
-                ctx.env = Z_ARRVAL_P(ptr);
-            }
-            else {
-                /* This should not happen */
-                zend_error(E_CORE_WARNING, "_ENV is not yet initialized");
-            }
-        }
-
-        zend_parse_ini_file(&fh, 1, ZEND_INI_SCANNER_RAW, ini_parser_callback, &ctx);
+        zend_parse_ini_file(&fh, 1, ZEND_INI_SCANNER_RAW, ini_parser_callback, &DOTENV_G(entries));
     }
 }
 
