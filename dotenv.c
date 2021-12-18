@@ -1,4 +1,5 @@
 #include "php_dotenv.h"
+#include <assert.h>
 #include <Zend/zend_ini_scanner.h>
 #include <Zend/zend_string.h>
 #include <ext/standard/info.h>
@@ -7,20 +8,30 @@ ZEND_DECLARE_MODULE_GLOBALS(dotenv);
 
 PHP_INI_BEGIN()
     STD_PHP_INI_ENTRY("dotenv.file", "", PHP_INI_PERDIR, OnUpdateString, filename, zend_dotenv_globals, dotenv_globals)
+    STD_PHP_INI_BOOLEAN("dotenv.populate_env", "0", PHP_INI_PERDIR, OnUpdateBool, populate_env, zend_dotenv_globals, dotenv_globals)
 PHP_INI_END()
+
+typedef struct callback_ctx {
+    HashTable* env;
+    HashTable* keys;
+} callback_ctx_t;
 
 static void ini_parser_callback(zval* key, zval* value, zval* index, int callback_type, void* arg)
 {
-    HashTable* ht = (HashTable*)arg;
+    callback_ctx_t* ctx = (callback_ctx_t*)arg;
+
     if (callback_type == ZEND_INI_PARSER_ENTRY && key) {
-        Z_ADDREF_P(value);
-        zend_hash_update(ht, Z_STR_P(key), value);
+        assert(Z_TYPE_P(key) == IS_STRING);
+        assert(Z_TYPE_P(value) == IS_STRING);
 
-        convert_to_string(value);
+        if (ctx->env) {
+            Z_ADDREF_P(value);
+            zend_hash_update(ctx->env, Z_STR_P(key), value);
+        }
+
         setenv(Z_STRVAL_P(key), Z_STRVAL_P(value), 1);
-
-        Z_ADDREF_P(value);
-        zend_hash_update(&DOTENV_G(entries), Z_STR_P(key), value);
+        /* Debug build of ZE does not like NULL in the third argument; we pass a valid pointer to keep ZE happy */
+        zend_hash_update_ptr(ctx->keys, Z_STR_P(key), Z_STR_P(key));
     }
 }
 
@@ -39,21 +50,30 @@ static void load_env_file()
         zend_file_handle fh;
         zend_stream_init_fp(&fh, f, filename);
 
-        if (PG(auto_globals_jit)) {
+        callback_ctx_t ctx;
+        ctx.env  = NULL;
+        ctx.keys = &DOTENV_G(entries);
+
+        if (DOTENV_G(populate_env)) {
+            if (PG(auto_globals_jit)) {
 #if PHP_VERSION_ID >= 80100
-            zend_is_auto_global(ZSTR_KNOWN(ZEND_STR_AUTOGLOBAL_ENV));
+                zend_is_auto_global(ZSTR_KNOWN(ZEND_STR_AUTOGLOBAL_ENV));
 #else
-            zend_is_auto_global_str(ZEND_STRL("_ENV"));
+                zend_is_auto_global_str(ZEND_STRL("_ENV"));
 #endif
+            }
+
+            zval* ptr = &PG(http_globals)[TRACK_VARS_ENV];
+            if (ptr && Z_TYPE_P(ptr) == IS_ARRAY) {
+                ctx.env = Z_ARRVAL_P(ptr);
+            }
+            else {
+                /* This should not happen */
+                zend_error(E_CORE_WARNING, "_ENV is not yet initialized");
+            }
         }
 
-        zval* ptr = &PG(http_globals)[TRACK_VARS_ENV];
-        if (ptr && Z_TYPE_P(ptr) == IS_ARRAY) {
-            zend_parse_ini_file(&fh, 1, ZEND_INI_SCANNER_RAW, ini_parser_callback, Z_ARRVAL_P(ptr));
-        }
-        else {
-            zend_error(E_CORE_WARNING, "_ENV is not yet initialized");
-        }
+        zend_parse_ini_file(&fh, 1, ZEND_INI_SCANNER_RAW, ini_parser_callback, &ctx);
     }
 }
 
@@ -80,7 +100,7 @@ static PHP_MSHUTDOWN_FUNCTION(dotenv)
 
 static PHP_RINIT_FUNCTION(dotenv)
 {
-    zend_hash_init(&DOTENV_G(entries), 32, NULL, ZVAL_PTR_DTOR, 0);
+    zend_hash_init(&DOTENV_G(entries), 32, NULL, NULL, 0);
     load_env_file();
     return SUCCESS;
 }

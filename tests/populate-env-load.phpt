@@ -1,9 +1,10 @@
 --TEST--
-Load ini file
+Load ini file (populate $_ENV)
 --SKIPIF--
 <?php require 'skipif.inc'; ?>
 --INI--
 dotenv.file = {PWD}/sample.env
+dotenv.populate_env = On
 --FILE--
 <?php
 var_export($_ENV['FOO']);
