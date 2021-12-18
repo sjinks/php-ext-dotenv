@@ -25,4 +25,8 @@ dotenv.file = /path/to/my/.env
 
 ## How It Works
 
-During the request startup, the extension reads the file specified in the `dotenv.file` setting, [parses that file as an INI-file](https://www.php.net/manual/en/function.parse-ini-file.php), and populates the `$_ENV` superglobal with the keys and values read from the file.
+During the request startup, the extension reads the file specified in the `dotenv.file` setting, [parses that file as an INI-file](https://www.php.net/manual/en/function.parse-ini-file.php), and populates both the environment and the `$_ENV` superglobal with the keys and values read from the file.
+
+The keys from the file will *overwrite* the existing environment variables.
+
+During the request shutdown, all the environment variables added or modified by this extension will be removed from the environment.
