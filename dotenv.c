@@ -15,6 +15,12 @@ static void ini_parser_callback(zval* key, zval* value, zval* index, int callbac
     if (callback_type == ZEND_INI_PARSER_ENTRY && key) {
         Z_ADDREF_P(value);
         zend_hash_update(ht, Z_STR_P(key), value);
+
+        convert_to_cstring(value);
+        setenv(Z_STRVAL_P(key), Z_STRVAL_P(value), 1);
+
+        Z_ADDREF_P(value);
+        zend_hash_update(&DOTENV_G(entries), Z_STR_P(key), value);
     }
 }
 
@@ -51,6 +57,15 @@ static void load_env_file()
     }
 }
 
+static int clean_up_env(zval* zval_ptr, int num_args, va_list args, zend_hash_key* hash_key)
+{
+    if (hash_key->key) {
+        unsetenv(hash_key->key->val);
+    }
+
+    return ZEND_HASH_APPLY_REMOVE;
+}
+
 static PHP_MINIT_FUNCTION(dotenv)
 {
     REGISTER_INI_ENTRIES();
@@ -65,7 +80,15 @@ static PHP_MSHUTDOWN_FUNCTION(dotenv)
 
 static PHP_RINIT_FUNCTION(dotenv)
 {
+    zend_hash_init(&DOTENV_G(entries), 32, NULL, ZVAL_PTR_DTOR, 0);
     load_env_file();
+    return SUCCESS;
+}
+
+static PHP_RSHUTDOWN_FUNCTION(dotenv)
+{
+    zend_hash_apply_with_arguments(&DOTENV_G(entries), clean_up_env, 0);
+    zend_hash_destroy(&DOTENV_G(entries));
     return SUCCESS;
 }
 
@@ -86,7 +109,7 @@ static zend_module_entry dotenv_module_entry = {
     PHP_MINIT(dotenv),
     PHP_MSHUTDOWN(dotenv),
     PHP_RINIT(dotenv),
-    NULL,
+    PHP_RSHUTDOWN(dotenv),
     PHP_MINFO(dotenv),
     PHP_DOTENV_EXTVER,
     PHP_MODULE_GLOBALS(dotenv),
