@@ -30,23 +30,26 @@ static void load_env_file()
     const char* filename = DOTENV_G(filename);
 
     if (filename && *filename && VCWD_STAT(filename, &st) == 0 && S_ISREG(st.st_mode)) {
-        FILE* f = VCWD_FOPEN(filename, "r");
-        if (!f) {
+        zend_file_handle fh;
+#if PHP_VERSION_ID < 70400
+        memset(&fh, 0, sizeof(fh));
+        fh.handle.fp = VCWD_FOPEN(filename, "r");
+        if (!fh.handle.fp) {
             zend_error(E_CORE_WARNING, "Cannot open file \"%s\" for reading", filename);
             return;
         }
 
-        zend_file_handle fh;
-#if PHP_VERSION_ID < 70400
-        memset(&fh, 0, sizeof(fh));
-        fh.type      = ZEND_HANDLE_FP;
-        fh.handle.fp = fp;
-        fh.filename  = zend_string_init(filename, strlen(filename), 0);
+        fh.type          = ZEND_HANDLE_FP;
+        fh.opened_path   = NULL;
+        fh.free_filename = 0;
+        fh.filename      = filename;
 #else
-        zend_stream_init_fp(&fh, f, filename);
+        zend_stream_init_filename(&fh, filename);
 #endif
         zend_parse_ini_file(&fh, 1, ZEND_INI_SCANNER_RAW, ini_parser_callback, &DOTENV_G(entries));
+#if PHP_VERSION_ID >= 80000
         zend_destroy_file_handle(&fh);
+#endif
     }
 }
 
