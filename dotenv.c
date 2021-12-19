@@ -46,6 +46,7 @@ static void load_env_file()
         zend_stream_init_fp(&fh, f, filename);
 #endif
         zend_parse_ini_file(&fh, 1, ZEND_INI_SCANNER_RAW, ini_parser_callback, &DOTENV_G(entries));
+        zend_destroy_file_handle(&fh);
     }
 }
 
