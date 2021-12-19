@@ -16,9 +16,10 @@ sudo make install
 
 ## Configuration
 
-|-----------------------|--------|----------------|---------------------------------------------------------------------|
-| `dotenv.file`         | string | PHP_INI_PERDIR | Name of the environment file.                                       |
-|-----------------------|--------|----------------|---------------------------------------------------------------------|
+
+| Setting       | Type   | Mode           | Description                   |
+|---------------|--------|----------------|-------------------------------|
+| `dotenv.file` | string | PHP_INI_PERDIR | Name of the environment file. |
 
 Example:
 ```ini
