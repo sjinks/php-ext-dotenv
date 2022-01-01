@@ -103,8 +103,8 @@ void parse_file(const char* fname, zval* zcontext, HashTable* res)
     while (rc == SUCCESS && (buf = php_stream_get_line(stream, NULL, 0, &line_len)) != NULL) { /* NOSONAR */
         zend_string* key;
         zend_string* val;
-        char* p = buf;
-        char* e = buf + line_len;
+        MAYBE_CONST char* p = buf;
+        MAYBE_CONST char* e = buf + line_len;
         while (p != e && isspace(*p)) {
             ++p;
         }
