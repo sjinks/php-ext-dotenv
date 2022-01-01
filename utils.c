@@ -18,7 +18,7 @@ static zend_bool is_readable(zend_string* dir) /* NOSONAR */
 static zend_string* get_cwd()
 {
     char path[MAXPATHLEN];
-    char* ret = NULL;
+    const char* ret = NULL;
 
 #if HAVE_GETCWD
     ret = VCWD_GETCWD(path, MAXPATHLEN);
