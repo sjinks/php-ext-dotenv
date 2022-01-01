@@ -42,19 +42,29 @@ dotenv.file = /path/to/example.org/.env
 
 During the request startup, the extension reads the file specified in the `dotenv.file` setting, parses that file, and populates the environment with the keys and values read from the file. The parser is compatible with that of [Node.js `dotenv`](https://www.npmjs.com/package/dotenv) version 10.0 (test cases use the same environment file to test parsing).
 
-The keys from the file will *overwrite* the existing environment variables.
-
 During the request shutdown, all the environment variables added or modified by this extension will be removed from the environment.
 
 ## API
 
-The extension provides one function:
+The extension provides the following functions:
 
 ```php
-function env_parse_file(string $filename, ?resource $context = null): array
+function dotenv_parse_file(string $filename, ?resource $context = null): array
 ```
 
 The function parses `$filename` as an .env file and returns the parsed variables and their values as an array (`array<string,string>`).
 `$context` is a [context resource](https://www.php.net/manual/en/stream.contexts.php).
 
 Refer to [`fopen()` ](https://www.php.net/manual/en/function.fopen.php) for the detailed description of what `$filename` and `$context` can be.
+
+```php
+function dotenv_setenv(array $env, bool $overwrite = ini_get('dotenv.overwrite')): void
+```
+
+Sets the environment variables from `$env`; the variables set will be unset during the request shutdown. `$overwrite` controls whether the existing environment variables should be overwritten (if a variable is not overwritten, it will not be unset).
+
+```php
+function dotenv_find_file_upward(string $dir, string $file): ?string
+```
+
+Searches for file `$file` by walking up the directory tree starting from `$dir` until the file is found or the root is reached.
