@@ -23,8 +23,10 @@
 ZEND_BEGIN_MODULE_GLOBALS(dotenv)
 	HashTable entries;
 	char* filename;
-	zend_bool overwrite_env;
+	char* cli_filename;
 	zend_string* re_ini_key_val;
+	zend_bool overwrite_env;
+	zend_bool cli_use_script_dir;
 ZEND_END_MODULE_GLOBALS(dotenv)
 
 DOTENV_VISIBILITY_HIDDEN ZEND_EXTERN_MODULE_GLOBALS(dotenv);

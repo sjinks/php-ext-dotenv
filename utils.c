@@ -1,5 +1,6 @@
 #include "php_dotenv.h"
 #include "utils.h"
+#include <main/SAPI.h>
 #include <ext/standard/php_filestat.h>
 #include <Zend/zend_smart_str.h>
 
@@ -12,6 +13,24 @@ static zend_bool is_readable(zend_string* dir) /* NOSONAR */
     php_stat(ZSTR_VAL(dir), ZSTR_LEN(dir), FS_IS_R, &rv);
 #endif
     return Z_TYPE(rv) == IS_TRUE;
+}
+
+static zend_string* get_cwd()
+{
+    char path[MAXPATHLEN];
+    const char* ret = NULL;
+
+#if HAVE_GETCWD
+    ret = VCWD_GETCWD(path, MAXPATHLEN);
+#elif HAVE_GETWD
+    ret = VCWD_GETWD(path);
+#endif
+
+    if (ret) {
+        return zend_string_init(ret, strlen(ret), 0);
+    }
+
+    return zend_string_init(ZEND_STRL("."), 0);
 }
 
 zend_string* find_file_upward(const zend_string* dir, const zend_string* name)
@@ -50,4 +69,32 @@ zend_string* find_file_upward(const zend_string* dir, const zend_string* name)
 
     zend_string_release(path);
     return NULL;
+}
+
+zend_string* cli_find_env_file(const char* filename, zend_bool use_cwd)
+{
+    zend_string* fname = zend_string_init(filename, strlen(filename), 0);
+    zend_string* dir;
+
+    if (use_cwd) {
+        dir = get_cwd();
+    }
+    else if (SG(request_info).path_translated) {
+        dir = zend_string_init(SG(request_info).path_translated, strlen(SG(request_info).path_translated), 0);
+#ifdef PHP_WIN32
+        ZSTR_LEN(dir) = php_win32_ioutil_dirname(ZSTR_VAL(dir), ZSTR_LEN(dir));
+#else
+        ZSTR_LEN(dir) = zend_dirname(ZSTR_VAL(dir), ZSTR_LEN(dir));
+#endif
+    }
+    else {
+        zend_error(E_CORE_WARNING, "Unable to get the script directory");
+        dir = zend_string_init(ZEND_STRL("."), 0);
+    }
+
+    zend_string* resolved = find_file_upward(dir, fname);
+    zend_string_release(dir);
+    zend_string_release(fname);
+
+    return resolved;
 }

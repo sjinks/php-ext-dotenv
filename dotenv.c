@@ -2,6 +2,7 @@
 #include <assert.h>
 #include <Zend/zend_ini_scanner.h>
 #include <Zend/zend_string.h>
+#include <main/php_main.h>
 #include <ext/standard/info.h>
 #include "parse.h"
 #include "utils.h"
@@ -10,6 +11,8 @@ ZEND_DECLARE_MODULE_GLOBALS(dotenv);
 
 PHP_INI_BEGIN()
     STD_PHP_INI_ENTRY("dotenv.file", "", PHP_INI_PERDIR, OnUpdateString, filename, zend_dotenv_globals, dotenv_globals)
+    STD_PHP_INI_ENTRY("dotenv.cli.file", "", PHP_INI_PERDIR, OnUpdateString, cli_filename, zend_dotenv_globals, dotenv_globals)
+    STD_PHP_INI_BOOLEAN("dotenv.cli.use_script_dir", "1", PHP_INI_PERDIR, OnUpdateBool, cli_use_script_dir, zend_dotenv_globals, dotenv_globals)
     STD_PHP_INI_BOOLEAN("dotenv.overwrite", "0", PHP_INI_PERDIR, OnUpdateBool, overwrite_env, zend_dotenv_globals, dotenv_globals)
 PHP_INI_END()
 
@@ -17,6 +20,15 @@ static void load_env_file(void)
 {
     struct zend_stat st;
     const char* filename = DOTENV_G(filename);
+    zend_string* resolved = NULL;
+
+    if (!strcmp(sapi_module.name, "cli")) {
+        const char* cli_filename = DOTENV_G(cli_filename);
+        if (cli_filename && *cli_filename) {
+            resolved = cli_find_env_file(cli_filename, !DOTENV_G(cli_use_script_dir));
+            filename = resolved ? ZSTR_VAL(resolved) : NULL;
+        }
+    }
 
     if (filename && *filename && VCWD_STAT(filename, &st) == 0 && S_ISREG(st.st_mode)) {
         HashTable ht;
@@ -33,6 +45,10 @@ static void load_env_file(void)
             }
         ZEND_HASH_FOREACH_END();
         zend_hash_destroy(&ht);
+    }
+
+    if (resolved) {
+        zend_string_release(resolved);
     }
 }
 
