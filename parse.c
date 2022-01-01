@@ -103,7 +103,17 @@ void parse_file(const char* fname, zval* zcontext, HashTable* res)
     while (rc == SUCCESS && (buf = php_stream_get_line(stream, NULL, 0, &line_len)) != NULL) { /* NOSONAR */
         zend_string* key;
         zend_string* val;
-        rc = parse_line(buf, line_len, &key, &val);
+        char* p = buf;
+        char* e = buf + line_len;
+        while (p != e && isspace(*p)) {
+            ++p;
+        }
+
+        while (p != e && isspace(*(e - 1))) {
+            --e;
+        }
+
+        rc = parse_line(p, e - p, &key, &val);
         efree(buf);
 
         if (rc == SUCCESS && key) {
