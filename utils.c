@@ -20,7 +20,6 @@ zend_string* find_file_upward(const zend_string* dir, const zend_string* name)
     zend_string* path = zend_string_init(ZSTR_VAL(dir), ZSTR_LEN(dir), 0);
 
     while (is_readable(path)) {
-        smart_str_free(&s);
         smart_str_append(&s, path);
         if (ZSTR_LEN(path) != 1 || ZSTR_VAL(path)[0] != PHP_DIR_SEPARATOR) {
             smart_str_appendc(&s, PHP_DIR_SEPARATOR);
@@ -33,6 +32,8 @@ zend_string* find_file_upward(const zend_string* dir, const zend_string* name)
             zend_string_release(path);
             return s.s;
         }
+
+        smart_str_free(&s);
 
         size_t path_len = ZSTR_LEN(path);
         size_t parent_len;
@@ -47,7 +48,6 @@ zend_string* find_file_upward(const zend_string* dir, const zend_string* name)
         }
     }
 
-    smart_str_free(&s);
     zend_string_release(path);
     return NULL;
 }
