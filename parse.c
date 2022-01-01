@@ -1,8 +1,9 @@
 #include "php_dotenv.h"
+#include "parse.h"
 #include <assert.h>
-#include <ext/standard/file.h>
 #include <main/php_streams.h>
 #include <ext/pcre/php_pcre.h>
+#include <ext/standard/file.h>
 #include <ext/standard/php_string.h>
 
 #if PHP_VERSION_ID < 70300

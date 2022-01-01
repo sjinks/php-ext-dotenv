@@ -4,7 +4,7 @@ env_parse_file()
 <?php include('skipif.inc'); ?>
 --FILE--
 <?php
-$arr = env_parse_file(__DIR__ . '/parse.env');
+$arr = dotenv_parse_file(__DIR__ . '/parse.env');
 var_export($arr);
 --EXPECT--
 array (

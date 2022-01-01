@@ -4,6 +4,7 @@
 #include <Zend/zend_string.h>
 #include <ext/standard/info.h>
 #include "parse.h"
+#include "utils.h"
 
 ZEND_DECLARE_MODULE_GLOBALS(dotenv);
 
@@ -90,7 +91,7 @@ static PHP_MINFO_FUNCTION(dotenv)
     DISPLAY_INI_ENTRIES();
 }
 
-static PHP_FUNCTION(env_parse_file)
+static PHP_FUNCTION(dotenv_parse_file)
 {
     char* filename;
     size_t filename_len;
@@ -112,19 +113,71 @@ static PHP_FUNCTION(env_parse_file)
     parse_file(filename, zcontext, Z_ARRVAL_P(return_value));
 }
 
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_env_parse_file, 0, 1, IS_ARRAY, 0)
+static PHP_FUNCTION(dotenv_setenv)
+{
+    HashTable* ht;
+    zend_bool overwrite = DOTENV_G(overwrite_env);
+    ZEND_PARSE_PARAMETERS_START(1, 2)
+        Z_PARAM_ARRAY_HT(ht)
+        Z_PARAM_OPTIONAL
+        Z_PARAM_BOOL(overwrite)
+    ZEND_PARSE_PARAMETERS_END();
+
+    ZEND_HASH_FOREACH_STR_KEY_VAL(ht, zend_string* key, const zval* val)
+        if (key && Z_TYPE_P(val) == IS_STRING && (overwrite || getenv(ZSTR_VAL(key)) == NULL)) {
+            setenv(ZSTR_VAL(key), Z_STRVAL_P(val), 1);
+            zend_hash_update_ptr(&DOTENV_G(entries), key, key);
+        }
+    ZEND_HASH_FOREACH_END();
+}
+
+static PHP_FUNCTION(dotenv_find_file_upward)
+{
+    zend_string* dir;
+    zend_string* name;
+
+    ZEND_PARSE_PARAMETERS_START(2, 2)
+        Z_PARAM_PATH_STR(dir)
+        Z_PARAM_PATH_STR(name)
+    ZEND_PARSE_PARAMETERS_END();
+
+    zend_string* fname = find_file_upward(dir, name);
+    if (fname) {
+        RETURN_STR(fname);
+    }
+
+    RETURN_NULL();
+}
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_dotenv_parse_file, 0, 1, IS_ARRAY, 0)
 	ZEND_ARG_TYPE_INFO(0, filename, IS_STRING, 0)
+#if PHP_VERSION_ID < 80000
+    ZEND_ARG_INFO(0, context)
+#else
+    ZEND_ARG_INFO_WITH_DEFAULT_VALUE(0, context, "null")
+#endif
 ZEND_END_ARG_INFO()
 
-static const zend_function_entry env_functions[] = {
-    ZEND_FE(env_parse_file, arginfo_env_parse_file)
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_dotenv_setenv, 0, 1, IS_VOID, 0)
+	ZEND_ARG_ARRAY_INFO(0, env, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_dotenv_find_file_upward, 0, 2, IS_STRING, 1)
+	ZEND_ARG_TYPE_INFO(0, start_dir, IS_STRING, 0)
+    ZEND_ARG_TYPE_INFO(0, filename, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
+static const zend_function_entry dotenv_functions[] = {
+    ZEND_FE(dotenv_parse_file, arginfo_dotenv_parse_file)
+    ZEND_FE(dotenv_setenv, arginfo_dotenv_setenv)
+    ZEND_FE(dotenv_find_file_upward, arginfo_dotenv_find_file_upward)
     ZEND_FE_END
 };
 
 static zend_module_entry dotenv_module_entry = {
     STANDARD_MODULE_HEADER,
     PHP_DOTENV_EXTNAME,
-    env_functions,
+    dotenv_functions,
     PHP_MINIT(dotenv),
     PHP_MSHUTDOWN(dotenv),
     PHP_RINIT(dotenv),
