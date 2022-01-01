@@ -17,14 +17,19 @@ sudo make install
 ## Configuration
 
 
-| Setting            | Type    | Mode           | Description                                                                  |
-|--------------------|---------|----------------|------------------------------------------------------------------------------|
-| `dotenv.file`      | string  | PHP_INI_PERDIR | Name of the environment file                                                 |
-| `dotenv.overwrite` | boolean | PHP_INI_PERDIR | Whether to overwrite the existing environment variables (`false` by default) |
+| Setting                      | Type    | Mode             | Description                                                                          |
+|------------------------------|---------|------------------|--------------------------------------------------------------------------------------|
+| `dotenv.file`                | string  | `PHP_INI_PERDIR` | Path to the environment file                                                         |
+| `dotenv.overwrite`           | boolean | `PHP_INI_PERDIR` | Whether to overwrite the existing environment variables (`false` by default)         |
+| `dotenv.cli.file`            | string  | `PHP_INI_PERDIR` | Name (without path) of the environment file for CLI. If set, overrides `dotenv.file` |
+| `dotenv.cli.use_script_dir`  | boolean | `PHP_INI_PERDIR` | If `On` (default), `dotenv.cli.file` will be searched for starting from the running script directory. Otherwise, the current directory will be used as a starting point |
 
 Example:
 ```ini
 dotenv.file = /path/to/my/.env
+dotenv.overwrite = On
+dotenv.cli.file = .env
+dotenv.cli.use_script_dir = Off
 ```
 
 For CGI and FastCGI, it is possible to set different values for [different hosts and paths](https://www.php.net/manual/en/ini.sections.php):
@@ -43,6 +48,8 @@ dotenv.file = /path/to/example.org/.env
 During the request startup, the extension reads the file specified in the `dotenv.file` setting, parses that file, and populates the environment with the keys and values read from the file. The parser is compatible with that of [Node.js `dotenv`](https://www.npmjs.com/package/dotenv) version 10.0 (test cases use the same environment file to test parsing).
 
 During the request shutdown, all the environment variables added or modified by this extension will be removed from the environment.
+
+For the CLI, it is possible to override the name of the environment file. If `dotenv.cli.file` is set, the extension will look for that file by walking up the directory tree starting from either the current directory (when `dotenv.cli.use_script_dir` is `Off`) or from the script directory (`On`).
 
 ## API
 
