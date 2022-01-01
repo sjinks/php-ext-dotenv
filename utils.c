@@ -6,7 +6,11 @@
 static zend_bool is_readable(const zend_string* dir)
 {
     zval rv;
+#if PHP_VERSION_ID >= 80100
+    php_stat(dir, FS_IS_R, &rv);
+#else
     php_stat(ZSTR_VAL(dir), ZSTR_LEN(dir), FS_IS_R, &rv);
+#endif
     return Z_TYPE(rv) == IS_TRUE;
 }
 
