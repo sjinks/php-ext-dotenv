@@ -5,6 +5,18 @@
 #include <ext/pcre/php_pcre.h>
 #include <ext/standard/php_string.h>
 
+#if PHP_VERSION_ID < 70300
+static void php_pcre_pce_incref(pcre_cache_entry* pce)
+{
+    ++pce->refcount;
+}
+
+static void php_pcre_pce_decref(pcre_cache_entry* pce)
+{
+    --pce->refcount;
+}
+#endif
+
 static int parse_line(char* line, size_t line_len, zend_string** key, zend_string** val)
 {
     assert(key != NULL);
@@ -25,11 +37,17 @@ static int parse_line(char* line, size_t line_len, zend_string** key, zend_strin
     ZVAL_NULL(&rv);
     ZVAL_NULL(&subpats);
 
+#if PHP_VERSION_ID < 70400
+    php_pcre_pce_incref(pce);
+    php_pcre_match_impl(pce, line, line_len, &rv, &subpats, 0, 0, 0, 0);
+    php_pcre_pce_decref(pce);
+#else
     zend_string* s = zend_string_init(line, line_len, 0);
     php_pcre_pce_incref(pce);
     php_pcre_match_impl(pce, s, &rv, &subpats, 0, 0, 0, 0);
     php_pcre_pce_decref(pce);
     zend_string_free(s);
+#endif
 
     if (Z_TYPE(rv) == IS_LONG && Z_LVAL(rv) == 1 && Z_TYPE(subpats) == IS_ARRAY && zend_hash_num_elements(Z_ARRVAL(subpats)) == 3) {
         zval* k = zend_hash_index_find(Z_ARRVAL(subpats), 1);
@@ -44,8 +62,8 @@ static int parse_line(char* line, size_t line_len, zend_string** key, zend_strin
         zend_bool is_single_quoted = 0;
         zend_bool is_double_quoted = 0;
 
-        size_t len    = Z_STRLEN_P(v);
-        const char* p = Z_STRVAL_P(v);
+        size_t len = Z_STRLEN_P(v);
+        char* p    = Z_STRVAL_P(v);
 
         if (len >= 2) {
             is_single_quoted = p[0] == '\'' && p[len-1] == '\'';
