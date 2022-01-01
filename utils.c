@@ -3,7 +3,7 @@
 #include <ext/standard/php_filestat.h>
 #include <Zend/zend_smart_str.h>
 
-static zend_bool is_readable(const zend_string* dir)
+static zend_bool is_readable(zend_string* dir) /* NOSONAR */
 {
     zval rv;
 #if PHP_VERSION_ID >= 80100
