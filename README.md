@@ -51,7 +51,10 @@ During the request shutdown, all the environment variables added or modified by 
 The extension provides one function:
 
 ```php
-function env_parse_file(string $filename): array
+function env_parse_file(string $filename, ?resource $context = null): array
 ```
 
 The function parses `$filename` as an .env file and returns the parsed variables and their values as an array (`array<string,string>`).
+`$context` is a [context resource](https://www.php.net/manual/en/stream.contexts.php).
+
+Refer to [`fopen()` ](https://www.php.net/manual/en/function.fopen.php) for the detailed description of what `$filename` and `$context` can be.

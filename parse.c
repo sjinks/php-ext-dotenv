@@ -92,9 +92,9 @@ static int parse_line(MAYBE_CONST char* line, size_t line_len, zend_string** key
     return SUCCESS;
 }
 
-void parse_file(const char* fname, HashTable* res)
+void parse_file(const char* fname, zval* zcontext, HashTable* res)
 {
-    php_stream_context* context = php_stream_context_from_zval(NULL, 0);
+    php_stream_context* context = php_stream_context_from_zval(zcontext, 0);
     php_stream* stream = php_stream_open_wrapper_ex(fname, "r", REPORT_ERRORS, NULL, context);
     char* buf;
     size_t line_len;
