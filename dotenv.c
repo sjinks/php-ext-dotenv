@@ -21,7 +21,7 @@ static void load_env_file(void)
         HashTable ht;
         zend_hash_init(&ht, 32, NULL, ZVAL_PTR_DTOR, 0);
 
-        parse_file(filename, &ht);
+        parse_file(filename, NULL, &ht);
 
         zend_bool overwrite = DOTENV_G(overwrite_env);
         ZEND_HASH_FOREACH_STR_KEY_VAL(&ht, zend_string* key, const zval* val)
@@ -94,16 +94,25 @@ static PHP_FUNCTION(env_parse_file)
 {
     char* filename;
     size_t filename_len;
+    zval* zcontext = NULL;
 
     ZEND_PARSE_PARAMETERS_START(1, 1)
         Z_PARAM_PATH(filename, filename_len)
+        Z_PARAM_OPTIONAL
+#if PHP_VERSION_ID < 70400
+        Z_PARAM_RESOURCE(zcontext)
+#elif PHP_VERSION_ID < 80000
+        Z_PARAM_RESOURCE_EX(zcontext, 1, 0)
+#else
+        Z_PARAM_RESOURCE_OR_NULL(zcontext)
+#endif
     ZEND_PARSE_PARAMETERS_END();
 
     array_init(return_value);
-    parse_file(filename, Z_ARRVAL_P(return_value));
+    parse_file(filename, zcontext, Z_ARRVAL_P(return_value));
 }
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_env_parse_file, 0, 0, 1)
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_env_parse_file, 0, 1, IS_ARRAY, 0)
 	ZEND_ARG_TYPE_INFO(0, filename, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
