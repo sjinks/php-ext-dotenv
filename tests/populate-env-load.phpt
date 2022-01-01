@@ -4,6 +4,7 @@ Load ini file (variables_order=EGPCS)
 <?php require 'skipif.inc'; ?>
 --INI--
 dotenv.file = {PWD}/sample.env
+dotenv.overwrite = On
 variables_order = EGPCS
 --FILE--
 <?php

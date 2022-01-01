@@ -4,6 +4,7 @@ Load ini file
 <?php require 'skipif.inc'; ?>
 --INI--
 dotenv.file = {PWD}/sample.env
+dotenv.overwrite = On
 --FILE--
 <?php
 echo getenv('FOO'), PHP_EOL;

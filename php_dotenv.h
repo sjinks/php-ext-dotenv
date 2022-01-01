@@ -4,7 +4,7 @@
 #include <main/php.h>
 
 #define PHP_DOTENV_EXTNAME     "dotenv"
-#define PHP_DOTENV_EXTVER      "0.3"
+#define PHP_DOTENV_EXTVER      "0.4"
 
 #ifdef HAVE_CONFIG_H
 #   include "config.h"
@@ -23,7 +23,8 @@
 ZEND_BEGIN_MODULE_GLOBALS(dotenv)
 	HashTable entries;
 	char* filename;
-	zend_bool populate_env;
+	zend_bool overwrite_env;
+	zend_string* re_ini_key_val;
 ZEND_END_MODULE_GLOBALS(dotenv)
 
 DOTENV_VISIBILITY_HIDDEN ZEND_EXTERN_MODULE_GLOBALS(dotenv);

@@ -2,7 +2,7 @@ PHP_ARG_ENABLE(dotenv, whether to enable the dotenv extension, [  --enable-doten
 
 if test "$PHP_DOTENV" = "yes"; then
 	AC_DEFINE([HAVE_DOTENV], [1], [Whether dotenv is enabled])
-	PHP_NEW_EXTENSION([dotenv], [dotenv.c], $ext_shared)
+	PHP_NEW_EXTENSION([dotenv], [dotenv.c parse.c], $ext_shared)
 fi
 
 PHP_ARG_ENABLE(coverage,  whether to include code coverage symbols,

@@ -17,9 +17,10 @@ sudo make install
 ## Configuration
 
 
-| Setting       | Type   | Mode           | Description                   |
-|---------------|--------|----------------|-------------------------------|
-| `dotenv.file` | string | PHP_INI_PERDIR | Name of the environment file. |
+| Setting            | Type    | Mode           | Description                                                                  |
+|--------------------|---------|----------------|------------------------------------------------------------------------------|
+| `dotenv.file`      | string  | PHP_INI_PERDIR | Name of the environment file                                                 |
+| `dotenv.overwrite` | boolean | PHP_INI_PERDIR | Whether to overwrite the existing environment variables (`false` by default) |
 
 Example:
 ```ini
@@ -39,8 +40,18 @@ dotenv.file = /path/to/example.org/.env
 
 ## How It Works
 
-During the request startup, the extension reads the file specified in the `dotenv.file` setting, [parses that file as an INI-file](https://www.php.net/manual/en/function.parse-ini-file.php), and populates the environment with the keys and values read from the file.
+During the request startup, the extension reads the file specified in the `dotenv.file` setting, parses that file, and populates the environment with the keys and values read from the file. The parser is compatible with that of [Node.js `dotenv`](https://www.npmjs.com/package/dotenv) version 10.0 (test cases use the same environment file to test parsing).
 
 The keys from the file will *overwrite* the existing environment variables.
 
 During the request shutdown, all the environment variables added or modified by this extension will be removed from the environment.
+
+## API
+
+The extension provides one function:
+
+```php
+function env_parse_file(string $filename): array
+```
+
+The function parses `$filename` as an .env file and returns the parsed variables and their values as an array (`array<string,string>`).
