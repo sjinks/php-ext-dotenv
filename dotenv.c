@@ -96,7 +96,7 @@ static PHP_FUNCTION(env_parse_file)
     size_t filename_len;
     zval* zcontext = NULL;
 
-    ZEND_PARSE_PARAMETERS_START(1, 1)
+    ZEND_PARSE_PARAMETERS_START(1, 2)
         Z_PARAM_PATH(filename, filename_len)
         Z_PARAM_OPTIONAL
 #if PHP_VERSION_ID < 70400
