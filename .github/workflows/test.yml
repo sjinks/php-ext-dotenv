@@ -77,4 +77,4 @@ jobs:
       - name: Run tests
         run: make test
         env:
-          TEST_PHP_ARGS: "-m --show-diff --show-out --show-mem"
+          TEST_PHP_ARGS: "-m --show-diff --show-out --show-mem -d pcre.jit=0"
