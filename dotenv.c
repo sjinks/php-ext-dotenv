@@ -24,9 +24,7 @@ static void load_env_file(void)
         parse_file(filename, &ht);
 
         zend_bool overwrite = DOTENV_G(overwrite_env);
-        zend_string* key;
-        zval* val;
-        ZEND_HASH_FOREACH_STR_KEY_VAL(&ht, key, val)
+        ZEND_HASH_FOREACH_STR_KEY_VAL(&ht, zend_string* key, const zval* val)
             assert(Z_TYPE_P(val) == IS_STRING);
             if (overwrite || getenv(ZSTR_VAL(key)) == NULL) {
                 setenv(ZSTR_VAL(key), Z_STRVAL_P(val), 1);

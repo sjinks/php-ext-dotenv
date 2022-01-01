@@ -17,7 +17,13 @@ static void php_pcre_pce_decref(pcre_cache_entry* pce)
 }
 #endif
 
-static int parse_line(char* line, size_t line_len, zend_string** key, zend_string** val)
+#if PHP_VERSION_ID >= 70400
+#   define MAYBE_CONST const
+#else
+#   define MAYBE_CONST
+#endif
+
+static int parse_line(MAYBE_CONST char* line, size_t line_len, zend_string** key, zend_string** val)
 {
     assert(key != NULL);
     assert(val != NULL);
@@ -62,8 +68,8 @@ static int parse_line(char* line, size_t line_len, zend_string** key, zend_strin
         zend_bool is_single_quoted = 0;
         zend_bool is_double_quoted = 0;
 
-        size_t len = Z_STRLEN_P(v);
-        char* p    = Z_STRVAL_P(v);
+        size_t len          = Z_STRLEN_P(v);
+        MAYBE_CONST char* p = Z_STRVAL_P(v);
 
         if (len >= 2) {
             is_single_quoted = p[0] == '\'' && p[len-1] == '\'';
@@ -94,10 +100,10 @@ void parse_file(const char* fname, HashTable* res)
     size_t line_len;
     int rc = SUCCESS;
 
-    while (rc == SUCCESS && (buf = php_stream_get_line(stream, NULL, 0, &line_len)) != NULL) {
+    while (rc == SUCCESS && (buf = php_stream_get_line(stream, NULL, 0, &line_len)) != NULL) { /* NOSONAR */
         zend_string* key;
         zend_string* val;
-        int rc = parse_line(buf, line_len, &key, &val);
+        rc = parse_line(buf, line_len, &key, &val);
         efree(buf);
 
         if (rc == SUCCESS && key) {
