@@ -46,7 +46,7 @@ static int clean_up_env(zval* zval_ptr, int num_args, va_list args, zend_hash_ke
 
 static PHP_GINIT_FUNCTION(dotenv)
 {
-    dotenv_globals->re_ini_key_val = zend_string_init(ZEND_STRL("/^\\s*([\\w.-]+)\\s*=\\s*(.*)\\s*$/"), 1);
+    dotenv_globals->re_ini_key_val = zend_string_init(ZEND_STRL("/^([\\w.-]+)\\s*=\\s*(.*+)$/"), 1);
 }
 
 static PHP_GSHUTDOWN_FUNCTION(dotenv)

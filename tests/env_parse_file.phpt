@@ -30,4 +30,6 @@ lines',
   'TRIM_SPACE_FROM_UNQUOTED' => 'some spaced out string',
   'USERNAME' => 'therealnerdybeast@example.tld',
   'SPACED_KEY' => 'parsed',
+  'ANOTHER_SPACED_KEY' => 'trailing spaces after value',
+  'EMPTY_WITH_TRAILING_SPACES' => '',
 )
