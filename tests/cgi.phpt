@@ -2,6 +2,7 @@
 dotenv.cli.file (CGI)
 --SKIPIF--
 <?php require 'skipif.inc'; ?>
+<?php if (PHP_VERSION_ID < 70300) die('SKIP PHP 7.3+ required');
 --CGI--
 --INI--
 dotenv.file={PWD}/generic.env
