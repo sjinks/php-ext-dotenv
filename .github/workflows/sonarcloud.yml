@@ -23,7 +23,7 @@ jobs:
           fetch-depth: 0
 
       - name: Set up PHP
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@d37cc3048580de06099c81ded417530716a0d7ab # tag=v2
         with:
           php-version: ${{ env.PHP_VERSION }}
           tools: none
