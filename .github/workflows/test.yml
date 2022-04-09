@@ -30,7 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out the source code
-        uses: actions/checkout@v2
+        uses: actions/checkout@a12a3943b4bdde767164f792f33f40b04645d846 # tag=v3
 
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
@@ -60,7 +60,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out the source code
-        uses: actions/checkout@v2
+        uses: actions/checkout@a12a3943b4bdde767164f792f33f40b04645d846 # tag=v3
 
       - name: Install valgrind
         run: sudo apt-get -qq update && sudo apt-get -y install valgrind
