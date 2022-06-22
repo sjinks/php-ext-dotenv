@@ -5,6 +5,9 @@ on:
       - "**"
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 env:
   CFLAGS: "-O2 -g3 -Wall -Werror"
   NO_INTERACTION: "1"
@@ -37,6 +40,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           tools: none
+          coverage: none
 
       - name: Build
         run: phpize && ./configure CC=${{ matrix.compiler.CC }} --silent && make --silent
@@ -70,6 +74,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           tools: none
+          coverage: none
 
       - name: Build
         run: phpize && ./configure --silent && make --silent

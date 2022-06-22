@@ -13,10 +13,10 @@ jobs:
     name: Run SonarScanner
     runs-on: ubuntu-latest
     env:
-      SONAR_SCANNER_VERSION: 4.6.1.2450
+      SONAR_SCANNER_VERSION: 4.7.0.2747
       SONAR_SERVER_URL: "https://sonarcloud.io"
       BUILD_WRAPPER_OUT_DIR: build_wrapper_output_directory
-      PHP_VERSION: 7.4
+      PHP_VERSION: 8.0
     steps:
       - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # tag=v3
         with:
@@ -27,6 +27,7 @@ jobs:
         with:
           php-version: ${{ env.PHP_VERSION }}
           tools: none
+          coverage: none
 
       - name: Set up JDK 11
         uses: actions/setup-java@16cca5479d7c6b6843f6a6515640ba33c6501543 # tag=v3.4.0
