@@ -11,3 +11,11 @@
    ...
    fun:php_print_info
 }
+{
+   <php82-__scandir64_tail>
+   Memcheck:Cond
+   ...
+   fun:__scandir64_tail
+   ...
+   fun:zm_startup_date
+}
