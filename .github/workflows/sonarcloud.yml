@@ -1,4 +1,5 @@
 name: Static Code Analysis
+
 on:
   push:
     branches:
@@ -8,10 +9,17 @@ on:
       - opened
       - synchronize
       - reopened
+
+permissions:
+  contents: read
+
 jobs:
   build:
     name: Run SonarScanner
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
     env:
       SONAR_SCANNER_VERSION: 4.7.0.2747
       SONAR_SERVER_URL: "https://sonarcloud.io"
