@@ -5,6 +5,9 @@ on:
       - "**"
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 env:
   CFLAGS: "-O2 -g3 -Wall -Werror"
   NO_INTERACTION: "1"
@@ -30,13 +33,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out the source code
-        uses: actions/checkout@v2
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # tag=v3
 
       - name: Set up PHP
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@cdb037c2a47e89a90eb317c7376c32a4cf92ddcc # tag=v2
         with:
           php-version: ${{ matrix.php }}
           tools: none
+          coverage: none
 
       - name: Build
         run: phpize && ./configure CC=${{ matrix.compiler.CC }} --silent && make --silent
@@ -60,16 +64,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out the source code
-        uses: actions/checkout@v2
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # tag=v3
 
       - name: Install valgrind
         run: sudo apt-get -qq update && sudo apt-get -y install valgrind
 
       - name: Set up PHP
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@cdb037c2a47e89a90eb317c7376c32a4cf92ddcc # tag=v2
         with:
           php-version: ${{ matrix.php }}
           tools: none
+          coverage: none
 
       - name: Build
         run: phpize && ./configure --silent && make --silent

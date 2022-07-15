@@ -1,4 +1,5 @@
 name: Static Code Analysis
+
 on:
   push:
     branches:
@@ -8,41 +9,49 @@ on:
       - opened
       - synchronize
       - reopened
+
+permissions:
+  contents: read
+
 jobs:
   build:
     name: Run SonarScanner
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
     env:
       SONAR_SCANNER_VERSION: 4.7.0.2747
       SONAR_SERVER_URL: "https://sonarcloud.io"
       BUILD_WRAPPER_OUT_DIR: build_wrapper_output_directory
-      PHP_VERSION: 7.4
+      PHP_VERSION: 8.0
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # tag=v3
         with:
           fetch-depth: 0
 
       - name: Set up PHP
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@cdb037c2a47e89a90eb317c7376c32a4cf92ddcc # tag=v2
         with:
           php-version: ${{ env.PHP_VERSION }}
           tools: none
+          coverage: none
 
       - name: Set up JDK 11
-        uses: actions/setup-java@v2.5.0
+        uses: actions/setup-java@2c7a4878f5d120bd643426d54ae1209b29cc01a3 # tag=v3.4.1
         with:
           distribution: temurin
           java-version: 11
 
       - name: Cache SonarCloud packages
-        uses: actions/cache@v2.1.7
+        uses: actions/cache@c3f1317a9e7b1ef106c153ac8c0f00fed3ddbc0d # tag=v3.0.4
         with:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
 
       - name: Cache for Incremental Analysis
-        uses: actions/cache@v2.1.7
+        uses: actions/cache@c3f1317a9e7b1ef106c153ac8c0f00fed3ddbc0d # tag=v3.0.4
         with:
           path: sonar-cache
           key: ${{ runner.os }}-sonar
