@@ -19,3 +19,11 @@
    ...
    fun:zm_startup_date
 }
+{
+   <php82-__scandir64_tail_2>
+   Memcheck:Cond
+   ...
+   fun:__scandir64_tail
+   ...
+   fun:zend_register_ini_entries_ex
+}
