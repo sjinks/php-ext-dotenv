@@ -116,13 +116,7 @@ static PHP_FUNCTION(dotenv_parse_file)
     ZEND_PARSE_PARAMETERS_START(1, 2)
         Z_PARAM_PATH(filename, filename_len)
         Z_PARAM_OPTIONAL
-#if PHP_VERSION_ID < 70400
-        Z_PARAM_RESOURCE(zcontext)
-#elif PHP_VERSION_ID < 80000
-        Z_PARAM_RESOURCE_EX(zcontext, 1, 0)
-#else
         Z_PARAM_RESOURCE_OR_NULL(zcontext)
-#endif
     ZEND_PARSE_PARAMETERS_END();
 
     array_init(return_value);
@@ -166,20 +160,16 @@ static PHP_FUNCTION(dotenv_find_file_upward)
 }
 
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_dotenv_parse_file, 0, 1, IS_ARRAY, 0)
-	ZEND_ARG_TYPE_INFO(0, filename, IS_STRING, 0)
-#if PHP_VERSION_ID < 80000
-    ZEND_ARG_INFO(0, context)
-#else
+    ZEND_ARG_TYPE_INFO(0, filename, IS_STRING, 0)
     ZEND_ARG_INFO_WITH_DEFAULT_VALUE(0, context, "null")
-#endif
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_dotenv_setenv, 0, 1, IS_VOID, 0)
-	ZEND_ARG_ARRAY_INFO(0, env, 0)
+    ZEND_ARG_ARRAY_INFO(0, env, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_dotenv_find_file_upward, 0, 2, IS_STRING, 1)
-	ZEND_ARG_TYPE_INFO(0, start_dir, IS_STRING, 0)
+    ZEND_ARG_TYPE_INFO(0, start_dir, IS_STRING, 0)
     ZEND_ARG_TYPE_INFO(0, filename, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 

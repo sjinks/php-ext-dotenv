@@ -4,7 +4,7 @@
 #include <main/php.h>
 
 #define PHP_DOTENV_EXTNAME     "dotenv"
-#define PHP_DOTENV_EXTVER      "0.4"
+#define PHP_DOTENV_EXTVER      "0.5.0"
 
 #ifdef HAVE_CONFIG_H
 #   include "config.h"
