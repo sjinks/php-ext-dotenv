@@ -28,6 +28,7 @@ jobs:
           - '8.2'
           - '8.3'
           - '8.4'
+          - '8.5'
     name: "Build and Test (PHP ${{ matrix.php }}, CC: ${{ matrix.compiler }}, no Valgrind)"
     runs-on: ubuntu-latest
     steps:
@@ -60,6 +61,7 @@ jobs:
           - '8.2'
           - '8.3'
           - '8.4'
+          - '8.5'
     name: "Build and Test (PHP ${{ matrix.php }}, with Valgrind)"
     runs-on: ubuntu-latest
     steps:
