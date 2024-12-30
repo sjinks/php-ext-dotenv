@@ -36,7 +36,7 @@ jobs:
           coverage: none
 
       - name: Install sonar-scanner and build-wrapper
-        uses: SonarSource/sonarcloud-github-c-cpp@816b1822d71776ee0d32bc012e95024ec52ac1fc # v3
+        uses: SonarSource/sonarcloud-github-c-cpp@816b1822d71776ee0d32bc012e95024ec52ac1fc # v3.1.0
 
       - name: Run build-wrapper
         run: |
@@ -54,5 +54,5 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           sonar-scanner \
-            -Dsonar.cfamily.build-wrapper-output="${{ env.BUILD_WRAPPER_OUT_DIR }}" \
+            -Dsonar.cfamily.compile-commands="${{ env.BUILD_WRAPPER_OUT_DIR }}/compile_commands.json" \
             -Dsonar.cfamily.gcov.reportsPath=$(pwd)
