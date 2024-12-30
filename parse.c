@@ -51,7 +51,11 @@ static int parse_line(MAYBE_CONST char* line, size_t line_len, zend_string** key
 #else
     zend_string* s = zend_string_init(line, line_len, 0);
     php_pcre_pce_incref(pce);
+#   if PHP_VERSION_ID < 80400
     php_pcre_match_impl(pce, s, &rv, &subpats, 0, 0, 0, 0);
+#   else
+    php_pcre_match_impl(pce, s, &rv, &subpats, 0, 0, 0);
+#   endif
     php_pcre_pce_decref(pce);
     zend_string_free(s);
 #endif
