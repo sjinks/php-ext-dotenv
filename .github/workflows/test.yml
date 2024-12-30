@@ -35,7 +35,7 @@ jobs:
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Set up PHP
-        uses: shivammathur/setup-php@e5af5d68b4befb00d8e033fe156ca9cec1fb2e53 # 2.32.0
+        uses: shivammathur/setup-php@9e72090525849c5e82e596468b86eb55e9cc5401 # 2.32.0
         with:
           php-version: ${{ matrix.php }}
           tools: none
@@ -70,7 +70,7 @@ jobs:
         run: sudo apt-get -qq update && sudo apt-get -y install valgrind
 
       - name: Set up PHP
-        uses: shivammathur/setup-php@e5af5d68b4befb00d8e033fe156ca9cec1fb2e53 # 2.32.0
+        uses: shivammathur/setup-php@9e72090525849c5e82e596468b86eb55e9cc5401 # 2.32.0
         with:
           php-version: ${{ matrix.php }}
           tools: none
