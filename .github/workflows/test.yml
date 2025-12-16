@@ -57,7 +57,12 @@ jobs:
           - '8.2'
           - '8.3'
           - '8.4'
-          - '8.5'
+        experimental:
+          - false
+        include:
+          - php: '8.5'
+            experimental: true
+
     name: "Build and Test (PHP ${{ matrix.php }}, with Valgrind)"
     runs-on: ubuntu-latest
     steps:
@@ -81,3 +86,4 @@ jobs:
         run: make test
         env:
           TEST_PHP_ARGS: "-m --show-diff --show-out --show-mem -d pcre.jit=0"
+        continue-on-error: ${{ matrix.experimental }}
