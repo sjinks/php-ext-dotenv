@@ -29,6 +29,8 @@ jobs:
           - '8.5'
     name: "Build and Test (PHP ${{ matrix.php }}, CC: ${{ matrix.compiler }}, no Valgrind)"
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Check out the source code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -62,9 +64,10 @@ jobs:
         include:
           - php: '8.5'
             experimental: true
-
     name: "Build and Test (PHP ${{ matrix.php }}, with Valgrind)"
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Check out the source code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
